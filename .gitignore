@@ -1,0 +1,34 @@
+## .NET / Visual Studio / Rider / VS Code
+
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+*.swp
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+## Rider
+.idea/
+
+## Secrets / local config (never commit real credentials)
+appsettings.Local.json
+appsettings.*.Development.json
+*.pfx
+secrets.json
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Logs
+*.log

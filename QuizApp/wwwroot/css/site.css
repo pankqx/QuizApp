@@ -1,0 +1,18 @@
+/* QuizApp custom styles */
+
+body {
+  min-height: 100vh;
+}
+
+.navbar-brand {
+  letter-spacing: 0.5px;
+}
+
+.card {
+  border-radius: 0.6rem;
+}
+
+footer {
+  padding: 1rem 0;
+  color: #6c757d;
+}

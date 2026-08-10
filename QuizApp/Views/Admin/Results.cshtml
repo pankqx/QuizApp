@@ -1,0 +1,79 @@
+@* ============================================================
+   FILE: Views/Admin/Results.cshtml
+   MODULE 3: Admin — All Student Results
+   DESCRIPTION: Displays a table of every student's test result.
+                Columns: Student Name, Email, Test Name, Score,
+                         Percentage (color-coded badge), Date Taken.
+                Green badge = ≥70% | Yellow badge = below 70%.
+   ============================================================ *@
+
+@model IEnumerable<TestResult>
+@{
+    ViewData["Title"] = "All Results";
+}
+
+@* Page header with Back to Tests button *@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>All Student Results</h2>
+    @* Navigates back to /Admin *@
+    <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">Back to Tests</a>
+</div>
+
+@* Results table wrapped in a card *@
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-bordered mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="p-3">Student Name</th>
+                    <th class="p-3">Email</th>
+                    <th class="p-3">Test Name</th>
+                    <th class="p-3">Score</th>
+                    <th class="p-3">Percentage</th>
+                    <th class="p-3">Date Taken</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* Show a message row if no results exist *@
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted p-4">No results yet.</td>
+                    </tr>
+                }
+
+                @foreach (var result in Model)
+                {
+                    @* Calculate percentage; guard against division by zero *@
+                    var percentage = (result.Score * 100) / (result.TotalQuestions > 0 ? result.TotalQuestions : 1);
+
+                    <tr>
+                        @* Student name — loaded via .Include(r => r.User) *@
+                        <td class="p-3 fw-semibold">@result.User?.FullName</td>
+
+                        @* Student email *@
+                        <td class="p-3 text-muted small">@result.User?.Email</td>
+
+                        @* Quiz title — loaded via .Include(r => r.Quiz) *@
+                        <td class="p-3">@result.Quiz?.Title</td>
+
+                        @* Raw score e.g. "4 / 5" *@
+                        <td class="p-3">@result.Score / @result.TotalQuestions</td>
+
+                        @* Color-coded badge: green ≥70%, yellow/orange below *@
+                        <td class="p-3">
+                            <span class="badge @(percentage >= 70 ? "bg-success" : "bg-warning text-dark")">
+                                @percentage%
+                            </span>
+                        </td>
+
+                        @* Date and time the quiz was taken *@
+                        <td class="p-3 text-muted small">
+                            @result.DateTaken.ToString("dd MMM yyyy, hh:mm tt")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

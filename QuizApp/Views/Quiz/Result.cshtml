@@ -1,0 +1,100 @@
+@* ============================================================
+   FILE: Views/Quiz/Result.cshtml
+   MODULE 4: Student — Test Result Summary
+   DESCRIPTION: Shown after a student submits a quiz.
+                Displays a summary card with:
+                  - Pass/Fail icon (✓ or ⚠)
+                  - Score percentage, correct count, and date
+                  - A color-coded progress bar
+                  - "Back to Dashboard" button
+                Pass threshold is 70%.
+   ============================================================ *@
+
+@model TestResult
+@{
+    ViewData["Title"] = "Test Result";
+
+    // Calculate percentage score; guard against division by zero
+    var percentage = (Model.Score * 100) / (Model.TotalQuestions > 0 ? Model.TotalQuestions : 1);
+
+    // Passed = 70% or above
+    var passed = percentage >= 70;
+}
+
+<div class="row justify-content-center mt-3">
+    <div class="col-md-7">
+        <div class="card shadow-sm text-center">
+            <div class="card-body p-5">
+
+                @* ── Pass/Fail Icon ─────────────────────────────── *@
+                <div class="mb-3">
+                    @if (passed)
+                    {
+                        @* ✓ checkmark for pass *@
+                        <span class="display-4 text-success">&#10003;</span>
+                    }
+                    else
+                    {
+                        @* ⚠ warning symbol for fail *@
+                        <span class="display-4 text-warning">&#9888;</span>
+                    }
+                </div>
+
+                @* ── Result Heading ──────────────────────────────── *@
+                <h2 class="card-title mb-1">
+                    @(passed ? "Well Done!" : "Test Completed")
+                </h2>
+                <p class="text-muted mb-4">
+                    You completed: <strong>@Model.Quiz?.Title</strong>
+                </p>
+
+                @* ── Score Summary — 3 stat boxes ─────────────────── *@
+                <div class="row g-3 mb-4">
+
+                    @* Box 1: Percentage score *@
+                    <div class="col-4">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted text-uppercase fw-semibold">Score</div>
+                            <div class="fs-3 fw-bold @(passed ? "text-success" : "text-warning")">
+                                @percentage%
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Box 2: Correct answers out of total *@
+                    <div class="col-4">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted text-uppercase fw-semibold">Correct</div>
+                            <div class="fs-3 fw-bold">
+                                @Model.Score <span class="fs-6 text-muted">/ @Model.TotalQuestions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Box 3: Date the quiz was taken *@
+                    <div class="col-4">
+                        <div class="border rounded p-3">
+                            <div class="small text-muted text-uppercase fw-semibold">Date</div>
+                            <div class="fw-semibold mt-1">
+                                @Model.DateTaken.ToString("dd MMM yyyy")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* ── Color-coded Progress Bar ────────────────────── *@
+                @* Green if passed, yellow/orange if failed *@
+                <div class="progress mb-4" style="height: 12px;">
+                    <div class="progress-bar @(passed ? "bg-success" : "bg-warning")"
+                         style="width: @percentage%"></div>
+                </div>
+
+                @* ── Back to Dashboard Button ────────────────────── *@
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-5">
+                    Back to Dashboard
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>

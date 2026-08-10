@@ -1,0 +1,54 @@
+@* ============================================================
+   FILE: Views/Account/Login.cshtml
+   MODULE 1: Login Page
+   DESCRIPTION: Login form for both Admin and Student users.
+                Validates email and password using ViewModel
+                annotations. On success, redirects based on role.
+   ============================================================ *@
+
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Login</h2>
+
+                @* Shows model-level errors (e.g. "Invalid email or password") *@
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <form asp-action="Login" method="post">
+
+                    @* Email field — validated by [EmailAddress] annotation *@
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    @* Password field — type="password" hides the input characters *@
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    @* Full-width Sign In button *@
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </div>
+                </form>
+
+                @* Link to the registration page *@
+                <p class="text-center mt-3 mb-0 small">
+                    Don't have an account?
+                    <a asp-controller="Account" asp-action="Register">Register here</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>

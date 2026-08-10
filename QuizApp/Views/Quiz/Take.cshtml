@@ -1,0 +1,83 @@
+@* ============================================================
+   FILE: Views/Quiz/Take.cshtml
+   MODULE 4: Student — Take Quiz
+   DESCRIPTION: Renders a quiz with all its questions.
+                Each question is shown as a card with 4 radio
+                button options (A/B/C/D). The first option of
+                each question is marked as required to ensure
+                the student answers all questions before submitting.
+                Submitting POST to /Quiz/Submit with quizId and
+                all selected answers.
+   ============================================================ *@
+
+@model Quiz
+@{
+    ViewData["Title"] = Model.Title;
+    int qIndex = 1; // Display counter for question numbers (Q1, Q2, ...)
+}
+
+@* Quiz header: title, description, question count badge *@
+<div class="mb-4">
+    <h2>@Model.Title</h2>
+    <p class="text-muted">@Model.Description</p>
+    <span class="badge bg-primary">@Model.Questions.Count Questions</span>
+</div>
+
+@* Form submits to QuizController.Submit via POST *@
+<form asp-controller="Quiz" asp-action="Submit" method="post">
+
+    @* Hidden field to pass the quiz ID to the controller *@
+    <input type="hidden" name="quizId" value="@Model.Id" />
+
+    @* Loop through each question and render a card *@
+    @foreach (var question in Model.Questions)
+    {
+        <div class="card shadow-sm mb-4">
+
+            @* Question number and text *@
+            <div class="card-header fw-semibold">
+                Q@(qIndex). @question.Text
+            </div>
+
+            <div class="card-body">
+                <div class="list-group">
+
+                    @* Option A — has "required" to force selection before submit *@
+                    <label class="list-group-item list-group-item-action">
+                        <input type="radio" name="question_@question.Id" value="A" required />
+                        &nbsp; A) @question.OptionA
+                    </label>
+
+                    @* Option B *@
+                    <label class="list-group-item list-group-item-action">
+                        <input type="radio" name="question_@question.Id" value="B" />
+                        &nbsp; B) @question.OptionB
+                    </label>
+
+                    @* Option C *@
+                    <label class="list-group-item list-group-item-action">
+                        <input type="radio" name="question_@question.Id" value="C" />
+                        &nbsp; C) @question.OptionC
+                    </label>
+
+                    @* Option D *@
+                    <label class="list-group-item list-group-item-action">
+                        <input type="radio" name="question_@question.Id" value="D" />
+                        &nbsp; D) @question.OptionD
+                    </label>
+
+                </div>
+            </div>
+        </div>
+
+        qIndex++; // Increment display number for next question
+    }
+
+    @* Cancel navigates back to student dashboard without saving *@
+    @* Submit sends answers to QuizController.Submit *@
+    <div class="d-flex justify-content-between align-items-center mt-2 mb-5">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success px-5">Submit Test</button>
+    </div>
+
+</form>

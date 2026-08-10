@@ -1,0 +1,62 @@
+@* ============================================================
+   FILE: Views/Admin/Index.cshtml
+   MODULE 3: Admin Dashboard — Manage Tests
+   DESCRIPTION: Shows all published quizzes as cards.
+                Each card shows: title, description, question count,
+                creator name, published badge, and creation date.
+                Includes a "+ Create New Test" button in the header.
+   ============================================================ *@
+
+@model IEnumerable<Quiz>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+@* Page header with Create New Test button *@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Manage Tests</h2>
+    @* Navigates to /Admin/CreateQuiz *@
+    <a asp-controller="Admin" asp-action="CreateQuiz" class="btn btn-success">+ Create New Test</a>
+</div>
+
+@* Show message if no quizzes have been created *@
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No tests created yet. Click "Create New Test" to get started.</div>
+}
+else
+{
+    @* Responsive 3-column grid of quiz cards *@
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var quiz in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+
+                        @* Quiz title and description *@
+                        <h5 class="card-title">@quiz.Title</h5>
+                        <p class="card-text text-muted small">@quiz.Description</p>
+
+                        @* Question count (requires .Include(q => q.Questions) in controller) *@
+                        <p class="small text-secondary mb-0">
+                            <strong>Questions:</strong> @quiz.Questions.Count
+                        </p>
+
+                        @* Creator name (requires .Include(q => q.CreatedBy) in controller) *@
+                        <p class="small text-secondary">
+                            <strong>Created by:</strong> @(quiz.CreatedBy?.FullName ?? "Admin")
+                        </p>
+
+                    </div>
+
+                    @* Card footer: Published badge + creation date *@
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="badge bg-success">Published</span>
+                        <small class="text-muted">@quiz.CreatedAt.ToString("dd MMM yyyy")</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

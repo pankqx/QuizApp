@@ -1,0 +1,91 @@
+@* ============================================================
+   FILE: Views/Home/Index.cshtml
+   MODULE 2: Student Dashboard — Available Tests
+   DESCRIPTION: Lists all available quizzes as cards.
+                - If the student has already taken a quiz:
+                    shows a progress bar with score percentage
+                    and a "View Result" button
+                - If the student has NOT taken the quiz:
+                    shows a "Take Test" button
+   ============================================================ *@
+
+@model IEnumerable<Quiz>
+@{
+    ViewData["Title"] = "My Tests";
+    // Retrieve results passed from HomeController via ViewBag
+    var results = ViewBag.Results as List<TestResult> ?? new List<TestResult>();
+}
+
+@* Page header with welcome message *@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Available Tests</h2>
+    <span class="text-muted">Welcome, @User.Identity!.Name</span>
+</div>
+
+@* Show message if no quizzes exist yet *@
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No tests are available at the moment. Please check back later.</div>
+}
+else
+{
+    @* Responsive 3-column grid of quiz cards *@
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var quiz in Model)
+        {
+            @* Check if this student already has a result for this quiz *@
+            var userResult = results.FirstOrDefault(r => r.QuizId == quiz.Id);
+
+            @* Calculate percentage score (0 if not yet attempted) *@
+            var percentage = userResult != null
+                ? (userResult.Score * 100) / (userResult.TotalQuestions > 0 ? userResult.TotalQuestions : 1)
+                : 0;
+
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+
+                        @* Quiz title and description *@
+                        <h5 class="card-title">@quiz.Title</h5>
+                        <p class="card-text text-muted small">@quiz.Description</p>
+                        <p class="small text-secondary">
+                            <strong>Questions:</strong> @quiz.Questions.Count
+                        </p>
+
+                        @* ── Already attempted: show score + View Result ── *@
+                        @if (userResult != null)
+                        {
+                            <div class="mb-2">
+                                <small class="text-muted">Your Score</small>
+                                @* Color: green if ≥70%, yellow/orange if below *@
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar @(percentage >= 70 ? "bg-success" : "bg-warning")"
+                                         style="width: @percentage%"></div>
+                                </div>
+                                <small class="fw-bold">
+                                    @userResult.Score / @userResult.TotalQuestions (@percentage%)
+                                </small>
+                            </div>
+                            @* Navigates to /Quiz/Result/{id} *@
+                            <a asp-controller="Quiz" asp-action="Result" asp-route-id="@userResult.Id"
+                               class="btn btn-outline-secondary btn-sm">View Result</a>
+                        }
+                        else
+                        {
+                            @* ── Not yet attempted: show Take Test button ── *@
+                            @* Navigates to /Quiz/Take/{id} *@
+                            <a asp-controller="Quiz" asp-action="Take" asp-route-id="@quiz.Id"
+                               class="btn btn-primary btn-sm">Take Test</a>
+                        }
+
+                    </div>
+
+                    @* Quiz creation date shown in card footer *@
+                    <div class="card-footer text-muted small">
+                        Created: @quiz.CreatedAt.ToString("dd MMM yyyy")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

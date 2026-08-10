@@ -1,0 +1,171 @@
+@* ============================================================
+   FILE: Views/Admin/CreateQuiz.cshtml
+   MODULE 3: Admin — Create New Test
+   DESCRIPTION: Form for creating a new quiz.
+                - Test Details section: title and description
+                - Questions section: starts with 1 question block
+                - "+ Add Another Question" dynamically adds new
+                  question blocks via JavaScript (no page reload)
+                - Each question has: text, 4 options, correct answer
+                - "Publish Test" submits the full form to AdminController
+   ============================================================ *@
+
+@model CreateQuizViewModel
+@{
+    ViewData["Title"] = "Create New Test";
+}
+
+@* Page header with Cancel button *@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Create New Test</h2>
+    @* Cancel navigates back to /Admin without saving *@
+    <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</div>
+
+<form asp-action="CreateQuiz" method="post" id="quizForm">
+
+    @* ── Section 1: Test Details ────────────────────────── *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-semibold">Test Details</div>
+        <div class="card-body">
+
+            @* Title field — required *@
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Test Title</label>
+                <input asp-for="Title" class="form-control"
+                       placeholder="e.g. Introduction to Algebra" required />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+
+            @* Description field — optional *@
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3"
+                          placeholder="Brief description of the test..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    @* ── Section 2: Questions Container ────────────────── *@
+    @* New question blocks are appended here by JavaScript *@
+    <div id="questionsContainer">
+
+        @* Default Question 1 — always shown on page load *@
+        <div class="card shadow-sm mb-3 question-block">
+            <div class="card-header fw-semibold">Question 1</div>
+            <div class="card-body">
+
+                @* Question text *@
+                <div class="mb-3">
+                    <label class="form-label">Question Text</label>
+                    <input name="Questions[0].Text" class="form-control"
+                           placeholder="Enter question..." required />
+                </div>
+
+                @* 4 options in a 2-column grid *@
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Option A</label>
+                        <input name="Questions[0].OptionA" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Option B</label>
+                        <input name="Questions[0].OptionB" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Option C</label>
+                        <input name="Questions[0].OptionC" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Option D</label>
+                        <input name="Questions[0].OptionD" class="form-control" required />
+                    </div>
+                </div>
+
+                @* Correct answer dropdown *@
+                <div class="mb-0">
+                    <label class="form-label">Correct Answer</label>
+                    <select name="Questions[0].CorrectOption" class="form-select w-auto">
+                        <option value="A">Option A</option>
+                        <option value="B">Option B</option>
+                        <option value="C">Option C</option>
+                        <option value="D">Option D</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>@* end #questionsContainer *@
+
+    @* ── Add Another Question Button ────────────────────── *@
+    @* Clicking this runs the JavaScript below to add a new question block *@
+    <button type="button" id="addQuestionBtn" class="btn btn-outline-primary w-100 mb-4">
+        + Add Another Question
+    </button>
+
+    @* ── Publish Test Button ─────────────────────────────── *@
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-success px-5">Publish Test</button>
+    </div>
+
+</form>
+
+@* ── JavaScript: Dynamically Add Question Blocks ─────────── *@
+@section Scripts {
+<script>
+    let questionCount = 1; // Tracks number of question blocks currently on page
+
+    document.getElementById('addQuestionBtn').addEventListener('click', function () {
+        const index = questionCount; // Zero-based index for form field names
+        const container = document.getElementById('questionsContainer');
+
+        // Create a new question card element
+        const block = document.createElement('div');
+        block.className = 'card shadow-sm mb-3 question-block';
+
+        // Inject the HTML for the new question block
+        // Field names use the index so MVC model binding works:
+        // Questions[1].Text, Questions[1].OptionA, etc.
+        block.innerHTML = `
+            <div class="card-header fw-semibold">Question ${index + 1}</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Question Text</label>
+                    <input name="Questions[${index}].Text" class="form-control"
+                           placeholder="Enter question..." required />
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Option A</label>
+                        <input name="Questions[${index}].OptionA" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Option B</label>
+                        <input name="Questions[${index}].OptionB" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Option C</label>
+                        <input name="Questions[${index}].OptionC" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Option D</label>
+                        <input name="Questions[${index}].OptionD" class="form-control" required />
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Correct Answer</label>
+                    <select name="Questions[${index}].CorrectOption" class="form-select w-auto">
+                        <option value="A">Option A</option>
+                        <option value="B">Option B</option>
+                        <option value="C">Option C</option>
+                        <option value="D">Option D</option>
+                    </select>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(block); // Add the new block to the page
+        questionCount++;              // Increment counter for next question
+    });
+</script>
+}
